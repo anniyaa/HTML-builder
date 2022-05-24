@@ -33,7 +33,6 @@ async function build_page() {
         template = template.replace(`{{${comp}}}`, comp_file.toString());
 
         if (!(el[ind+1])) {
-          console.log(template);
           resolve(template);
         }
       });
@@ -49,6 +48,45 @@ async function build_page() {
 
   });
 
+
+
 }
 
 build_page();
+
+async function cssBundle() {
+  const cssFilePath = path.join(__dirname + '/styles');
+  const readDir = await fs.readdir(cssFilePath);
+
+  const bundlePath = path.join(__dirname + '/project-dist/');
+  await fs.writeFile(bundlePath+'style.css', '');
+
+  const combine_css = new Promise((resolve) => {
+    const combain_styles = [];
+
+    readDir.forEach(el=>{
+      if (path.extname(el) === '.css') {
+        const readcssFile = fss.createReadStream(__dirname + '/styles/' + el);
+        readcssFile.on('data', (chunk => {
+          combain_styles.push(chunk.toString());
+        }));
+        readcssFile.on('end', ()=> {
+          resolve(combain_styles);
+        });
+
+
+      }
+    });
+  });
+
+  combine_css.then((arr)=> {
+    const writecss = fss.createWriteStream(bundlePath + 'style.css');
+
+    arr.forEach(str=>{
+      writecss.write(str);
+    });
+  });
+
+
+}
+cssBundle();
