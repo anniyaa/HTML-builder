@@ -43,8 +43,45 @@ async function build_page() {
     edit_template.then((temp)=>{
 
       writeFile.write(temp);
-    });
 
+
+
+      /////////////////
+      async function copyFiles() {
+        const assetsfilePath = path.join(__dirname + '/project-dist' + '/assets');
+        await fs.mkdir(assetsfilePath, {recursive:true});
+
+
+        async function recursive_assets(f) {
+          await fs.readdir(path.join(__dirname + '/assets/' + f)).then(el=>{
+            el.forEach(fl=>{
+              fs.writeFile(path.join(__dirname + '/project-dist' + '/assets' + '/' + f + '/' + fl), '').then(
+                fs.copyFile(path.join(__dirname + '/assets' + '/' + f + '/' + fl), path.join(__dirname + '/project-dist' + '/assets' + '/' + f + '/' + fl))
+              );
+            });
+          });
+
+
+        }
+
+        const copyDir = await fs.readdir(path.join(__dirname + '/project-dist/assets') );
+        copyDir.forEach( f=>{
+          fs.mkdir(path.join(__dirname + '/project-dist/assets/' + f), {recursive:true});
+          recursive_assets(f);
+        });
+
+
+      }
+
+      copyFiles();
+      ///////////////////////////
+
+
+
+
+
+
+    });
 
   });
 
@@ -85,8 +122,12 @@ async function cssBundle() {
     arr.forEach(str=>{
       writecss.write(str);
     });
+
   });
 
 
 }
+
 cssBundle();
+
+
