@@ -2,6 +2,8 @@ const fs = require('fs/promises');
 const path = require('path');
 const fss = require('fs');
 
+fs.mkdir(__dirname + '/project-dist', {recursive:true});
+
 async function build_page() {
   const templatePath = path.join(__dirname + '/template.html');
   let template = (await fs.readFile(templatePath)).toString();
@@ -133,5 +135,3 @@ async function cssBundle() {
 }
 
 cssBundle();
-
-
